@@ -1,0 +1,8 @@
+.DS_Store
+.env
+docker/.env
+
+# Real environment files (secrets, machine-specific). Copy from *.example — see README.
+env/.env.local
+env/.env.staging
+env/.env.prod
