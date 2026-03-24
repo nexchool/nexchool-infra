@@ -24,6 +24,14 @@ school-ERP/
 
 Default contexts: `**../../server**`, `**../../admin-web**`, `**../../panel**` (from `docker/` up to monorepo root).
 
+## AWS deployment
+
+For **EC2 + Docker Compose + ECR + RDS + S3** (staging + prod) and CI/CD, use:
+
+- `aws/AWS_DEPLOYMENT_GUIDE.md`
+- `aws/terraform/*`
+- `aws/ec2/nginx.conf` (reference; production `nginx.conf` is rendered from `aws/terraform/templates/nginx.conf.tpl`)
+
 If apps live elsewhere, set paths **relative to `school-erp-infra/docker/`**, for example sibling repos:
 
 ```env
@@ -34,7 +42,7 @@ SERVER_CONTEXT=../../../other-root/server
 
 | File | Commit to Git? |
 |------|----------------|
-| **`env/.env.local`**, **`env/.env.staging`**, **`env/.env.prod`** | **No** — they can hold passwords, JWT secrets, and real DB URLs. They are listed in **`.gitignore`**. |
+| **`env/.env.*`** (real files, e.g. `.env.local`, `.env.staging`, `.env.prod`) | **No** — passwords, JWT secrets, DB URLs. **`.gitignore`** ignores `env/.env*` and un-ignores only **`env/.env.*.example`**. |
 | **`env/.env.*.example`** | **Yes** — templates with `CHANGEME` / safe dev defaults so others know which variables exist. |
 
 **First-time setup**
@@ -51,13 +59,15 @@ Same idea for staging/prod on a server: copy the matching `.example` → real fi
 **If you already committed real `.env.*` files**, remove them from Git history tracking (file can stay on disk):
 
 ```bash
-git rm --cached env/.env.local env/.env.staging env/.env.prod
+git rm --cached env/.env.local env/.env.staging env/.env.prod  # or any tracked env/.env.*
 git commit -m "Stop tracking env secrets; use .example templates"
 ```
 
 Then rotate any secrets that were ever pushed (passwords, `JWT_SECRET_KEY`, etc.) — assume they are compromised.
 
 ### Merging old `server/` / app `.env` files
+
+App repos (**`server`**, **`admin-web`**, **`panel`**, **`client`**) use **`.env*`** in their **`.gitignore`** with exceptions only for **`.env.example`** and **`.env.*.example`** — do not commit `.env.local` or `.env.production`.
 
 If you previously used **`server/.env`**, **`admin-web/.env`**, **`panel/.env`**, **`client/.env`**:
 

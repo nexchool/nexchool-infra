@@ -2,7 +2,23 @@
 .env
 docker/.env
 
-# Real environment files (secrets, machine-specific). Copy from *.example — see README.
-env/.env.local
-env/.env.staging
-env/.env.prod
+# env/ — real files only; keep `*.example` committed (see README).
+env/.env*
+!env/.env.*.example
+
+# SSH keys / certs accidentally dropped in-repo
+*.pem
+
+# --- Terraform (aws/terraform) ---
+# Commit: *.tf, outputs.tf, templates/, .terraform.lock.hcl, *.tfvars.example, docs under aws/
+# Do NOT commit: state, local provider cache, or any real *.tfvars (secrets).
+aws/terraform/.terraform/
+aws/terraform/*.tfstate
+aws/terraform/*.tfstate.*
+aws/terraform/crash.log
+aws/terraform/crash.*.log
+aws/terraform/.terraform.tfstate.lock.info
+aws/terraform/*.tfvars
+aws/terraform/override.tf
+aws/terraform/override.tf.json
+aws/terraform/*_override.tf

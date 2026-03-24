@@ -1,0 +1,47 @@
+environment          = "prod"
+aws_region           = "ap-south-1"
+vpc_cidr             = "10.40.0.0/16"
+public_subnet_cidrs  = ["10.40.1.0/24", "10.40.2.0/24"]
+
+ec2_instance_type = "t4g.micro"
+# Must match an existing key pair NAME in EC2 (same region as aws_region). Create in console if missing.
+ec2_key_name      = "CHANGE_ME"
+ssh_cidr          = "CHANGE_ME"
+ec2_root_volume_gb = 30
+
+db_name     = "CHANGE_ME"
+db_username = "postgres"
+# RDS: 8–128 chars; printable ASCII only — do NOT use / @ " or space (e.g. base64 often has / and + is OK).
+db_password = "CHANGE_ME_STRONG_NO_AT_SLASH_QUOTE_OR_SPACE"
+
+secret_key     = "CHANGE_ME"
+jwt_secret_key = "CHANGE_ME"
+
+# Comma-separated; include your public site origin(s), e.g. http://<EIP> until you have HTTPS.
+cors_origins = "http://localhost:3000"
+
+# Optional public URLs — empty app_public_base_url = http://<Elastic IP> at apply time.
+# Set to https://your-domain when DNS + TLS are ready (must match CI NEXT_PUBLIC_API_URL_PROD).
+app_public_base_url = ""
+next_public_api_url = ""
+
+frontend_url = "schoolerp://"
+
+# default_user_role = "Student"
+
+# Optional mail (leave empty to disable outbound email from the API)
+# smtp_server         = ""
+# smtp_port           = 587
+# email_address       = ""
+# email_password      = "" # sensitive
+# default_sender_name = ""
+# mail_use_tls        = "true"
+
+# Optional Next.js tuning / gateway (see aws/terraform/app.env.example)
+# next_public_gateway_origin = ""
+# node_env                   = "production"
+# next_telemetry_disabled    = "1"
+# node_options               = "--max-old-space-size=128"
+
+# API listen port (must match nginx upstream — leave default unless you know the implications)
+# api_port = 5001
