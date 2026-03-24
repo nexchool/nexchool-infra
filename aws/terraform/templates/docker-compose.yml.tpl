@@ -26,6 +26,7 @@ services:
 
   api:
     image: ${ecr_api_url}:latest
+    platform: linux/amd64
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
