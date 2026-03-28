@@ -29,6 +29,7 @@ EMAIL_ADDRESS=${email_address}
 EMAIL_PASSWORD=${email_password}
 DEFAULT_SENDER_NAME=${default_sender_name}
 MAIL_USE_TLS=${mail_use_tls}
+MAIL_USE_SSL=${mail_use_ssl}
 
 AWS_REGION=${aws_region}
 S3_BUCKET_NAME=${s3_bucket_name}

@@ -369,6 +369,7 @@ resource "aws_instance" "app" {
       email_password                   = var.email_password
       default_sender_name              = var.default_sender_name
       mail_use_tls                     = var.mail_use_tls
+      mail_use_ssl                     = var.mail_use_ssl
       aws_region                       = var.aws_region
       s3_bucket_name                   = aws_s3_bucket.documents.bucket
       port                             = var.api_port

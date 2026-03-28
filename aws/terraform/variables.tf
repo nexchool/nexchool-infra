@@ -196,6 +196,12 @@ variable "mail_use_tls" {
   default     = "true"
 }
 
+variable "mail_use_ssl" {
+  description = "MAIL_USE_SSL for Flask-Mail."
+  type        = string
+  default     = "false"
+}
+
 # --- Redis (Compose service names) ---
 variable "redis_url" {
   type    = string
@@ -255,7 +261,7 @@ variable "node_options" {
 }
 
 variable "next_public_gateway_origin" {
-  description = "Optional NEXT_PUBLIC_GATEWAY_ORIGIN for admin-web/panel when opened on :3000 (empty = client falls back to hostname:8080)."
+  description = "Optional NEXT_PUBLIC_GATEWAY_ORIGIN for admin-web/panel when opened on :3000 (empty = client falls back to hostname:80)."
   type        = string
   default     = ""
 }

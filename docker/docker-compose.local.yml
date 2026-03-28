@@ -1,7 +1,7 @@
 # From infra root: ./scripts/dev.sh
 # Build/volume paths are relative to this file's directory (docker/).
 # Nested layout: apps at ../../server, ../../admin-web, ../../panel (monorepo root).
-# Nginx: host ${HTTP_PORT} -> container 8080 (same nginx.conf as staging/prod).
+# Nginx: host ${HTTP_PORT} -> container 80 (uses nginx/nginx.local.conf).
 
 name: school-erp-local
 
@@ -130,7 +130,7 @@ services:
       NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
       NEXT_PUBLIC_API_URL_DEV: ${PUBLIC_API_URL:-}
       # Browser on :3000/:3001 must call Flask via nginx (${HTTP_PORT}), not Next.
-      NEXT_PUBLIC_GATEWAY_ORIGIN: http://localhost:${HTTP_PORT:-8080}
+      NEXT_PUBLIC_GATEWAY_ORIGIN: http://localhost:${HTTP_PORT:-80}
     depends_on:
       api:
         condition: service_healthy
@@ -154,7 +154,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
       NEXT_PUBLIC_API_URL_DEV: ${PUBLIC_API_URL:-}
-      NEXT_PUBLIC_GATEWAY_ORIGIN: http://localhost:${HTTP_PORT:-8080}
+      NEXT_PUBLIC_GATEWAY_ORIGIN: http://localhost:${HTTP_PORT:-80}
     depends_on:
       api:
         condition: service_healthy
@@ -163,9 +163,9 @@ services:
   nginx:
     image: nginx:1.27-alpine
     ports:
-      - "${HTTP_PORT:-8080}:8080"
+      - "${HTTP_PORT:-80}:80"
     volumes:
-      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       api:
         condition: service_healthy

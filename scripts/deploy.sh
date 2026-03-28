@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-# Usage: ./scripts/deploy.sh [staging|prod]
+# Usage: ./scripts/deploy.sh [prod]
 # Pulls app repos (paths from the matching env file), then rebuilds that stack.
 # SERVER_CONTEXT / *_CONTEXT values are relative to school-erp-infra/docker/
 # (same as Docker Compose), e.g. ../../server when infra is school-ERP/school-erp-infra/.
@@ -11,16 +11,12 @@ COMPOSE_DIR="$ROOT/docker"
 
 TARGET="${1:-prod}"
 case "$TARGET" in
-  staging)
-    ENV_FILE="$ROOT/env/.env.staging"
-    COMPOSE_FILE="docker/docker-compose.staging.yml"
-    ;;
   prod)
     ENV_FILE="$ROOT/env/.env.prod"
     COMPOSE_FILE="docker/docker-compose.prod.yml"
     ;;
   *)
-    echo "Usage: $0 [staging|prod]" >&2
+    echo "Usage: $0 [prod]" >&2
     exit 1
     ;;
 esac

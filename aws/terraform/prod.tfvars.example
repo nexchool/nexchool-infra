@@ -17,13 +17,16 @@ db_password = "CHANGE_ME_STRONG_NO_AT_SLASH_QUOTE_OR_SPACE"
 secret_key     = "CHANGE_ME"
 jwt_secret_key = "CHANGE_ME"
 
-# Comma-separated; include your public site origin(s), e.g. http://<EIP> until you have HTTPS.
-cors_origins = "http://localhost:3000"
+# Comma-separated; allow only your web apps to call the API from browsers.
+# For Nexchool prod:
+# - https://app.nexchool.in   (school admin)
+# - https://panel.nexchool.in (super admin)
+cors_origins = "https://app.nexchool.in,https://panel.nexchool.in"
 
 # Optional public URLs — empty app_public_base_url = http://<Elastic IP> at apply time.
-# Set to https://your-domain when DNS + TLS are ready (must match CI NEXT_PUBLIC_API_URL_PROD).
-app_public_base_url = ""
-next_public_api_url = ""
+# With separate API domain, set both to your API origin:
+app_public_base_url = "https://api.nexchool.in"
+next_public_api_url = "https://api.nexchool.in"
 
 frontend_url = "schoolerp://"
 
@@ -36,6 +39,7 @@ frontend_url = "schoolerp://"
 # email_password      = "" # sensitive
 # default_sender_name = ""
 # mail_use_tls        = "true"
+# mail_use_ssl        = "false"
 
 # Optional Next.js tuning / gateway (see aws/terraform/app.env.example)
 # next_public_gateway_origin = ""
