@@ -144,7 +144,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
     ports:
-      # Super admin uses basePath /panel → open http://localhost:PANEL_HOST_PORT/panel/
+      # Super admin: http://localhost:PANEL_HOST_PORT/ or via nginx http://panel.localhost/ (see nginx.local.conf)
       - "${PANEL_HOST_PORT:-3001}:3000"
     volumes:
       - ${SUPER_ADMIN_CONTEXT:-../../panel}:/app

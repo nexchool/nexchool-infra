@@ -97,7 +97,7 @@ Staging uses Compose project name `**school-erp-staging`** and a separate Postgr
 | **Env file** | `env/.env.local` | `env/.env.staging` | `env/.env.prod` |
 | **Next / API** | Dev images (`Dockerfile.dev`, Next `development`) | Production Dockerfile targets | Production Dockerfile targets |
 | **Nginx published** | `${HTTP_PORT}:8080` | `${HTTP_PORT}:8080` | `${HTTP_PORT}:8080` |
-| **Next on host (3000/3001)** | Yes — optional (`ADMIN_WEB_HOST_PORT`, `PANEL_HOST_PORT` in `.env.local`) | **No** — use `http://host:$HTTP_PORT/` and `/panel/` | **No** — use nginx or external LB |
+| **Next on host (3000/3001)** | Yes — optional (`ADMIN_WEB_HOST_PORT`, `PANEL_HOST_PORT` in `.env.local`) | **No** — use nginx or external LB (panel on its own Host or port) | **No** — use nginx or external LB |
 | **`nginx/nginx.conf`** | **One file:** `listen 8080;` in-container — **must** match compose `…:8080` | | |
 
 **Port contract (do not split this across edits):** `nginx/nginx.conf` → **`listen 8080;`**. All three compose files → **`"${HTTP_PORT:-8080}:8080"`** for the nginx service. `HTTP_PORT` is only the **host** port (browser / CORS); nginx always listens on **8080 inside the container**. Example: `HTTP_PORT=80` → host **80** → container **8080**.
@@ -129,13 +129,13 @@ Internal Docker DNS: `**postgres**`, `**redis**`, `**api**`, `**admin-web**`, `*
 With `HTTP_PORT=8080`:
 
 - **http://localhost:8080/** — school admin (Next)
-- **http://localhost:8080/panel/** — super admin (Next; `basePath: "/panel"`)
+- **http://panel.localhost/** (add `127.0.0.1 panel.localhost` to `/etc/hosts`) — super admin via nginx
 - **http://localhost:8080/api/...** — API
 
 `admin-web` and `panel` also publish **direct** dev ports (see `env/.env.local`):
 
 - **http://localhost:3000/** — school admin (bypass nginx)
-- **http://localhost:3001/panel/** — super admin (path **`/panel`** required)
+- **http://localhost:3001/** — super admin (bypass nginx)
 
 Inside Docker, both Next apps listen on **3000**; only **nginx** had a host port before — that’s why `:3000` / `:3001` looked “dead” until those mappings were added to `docker-compose.local.yml`.
 

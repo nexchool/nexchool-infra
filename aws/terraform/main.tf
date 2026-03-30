@@ -385,7 +385,8 @@ resource "aws_instance" "app" {
       next_public_gateway_origin       = var.next_public_gateway_origin
     }))
     nginx_b64 = base64encode(templatefile("${path.module}/templates/nginx.conf.tpl", {
-      api_port = var.api_port
+      api_port           = var.api_port
+      panel_server_name  = var.panel_server_name
     }))
     aws_region   = var.aws_region
     ecr_registry = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com"

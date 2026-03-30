@@ -35,7 +35,19 @@ http {
     server panel:3000;
   }
 
-  # HTTP — expose only port 80 from this container
+%{ if trimspace(panel_server_name) != "" ~}
+  # Super admin panel (dedicated Host — no /panel path prefix in the app)
+  server {
+    listen 80;
+    server_name ${panel_server_name};
+
+    location / {
+      proxy_pass http://panel_upstream;
+    }
+  }
+
+%{ endif ~}
+  # Default: school admin + API paths (same Docker network)
   server {
     listen 80;
     server_name _;
@@ -49,13 +61,6 @@ http {
 
     location = /health {
       proxy_pass http://api_upstream;
-    }
-
-    location ^~ /panel/ {
-      proxy_pass http://panel_upstream;
-    }
-    location = /panel {
-      return 302 /panel/;
     }
 
     location / {

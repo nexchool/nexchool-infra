@@ -54,22 +54,19 @@ docker buildx build \
 
 ### 3. Nginx Routing
 
-| Route    | Service   |
-| -------- | --------- |
-| `/`      | admin-web |
-| `/panel` | panel     |
-| `/api`   | backend   |
+| Route / host | Service   |
+| ------------ | --------- |
+| `/` (default `server_name`) | admin-web |
+| Dedicated Host for panel (e.g. `panel.example.com` from Terraform `panel_server_name`) | panel |
+| `/api` | backend   |
+
+The panel app uses **root paths** (`/login`, `/dashboard`). Route it with a **separate `server_name`** (subdomain), not a `/panel` URL prefix.
 
 ---
 
-### 4. Panel Special Config (Next.js)
+### 4. Panel build (Next.js)
 
-```js
-basePath: "/panel",
-assetPrefix: "/panel",
-```
-
-⚠️ Must be applied at **build time**
+`NEXT_PUBLIC_API_URL` (and related `NEXT_PUBLIC_*` vars) must be set at **Docker build** time for the panel image.
 
 ---
 
@@ -163,8 +160,8 @@ docker compose logs panel
 
 ### ❌ Panel redirect loop
 
-👉 Missing basePath
-✔ Fix Next.js config
+👉 Auth cookie / middleware / wrong Host (panel must hit the panel container, not admin-web)
+✔ Check `panel_server_name` in Terraform + DNS; verify `NEXT_PUBLIC_API_URL` at image build time
 
 ---
 
@@ -231,7 +228,7 @@ terraform apply
 
 ```
 http://<EIP>/          → Admin Web
-http://<EIP>/panel     → Panel
+http://<panel-host>/   → Panel (same EIP, different Host — set `panel_server_name` in Terraform)
 http://<EIP>/api/health → API
 ```
 

@@ -108,6 +108,12 @@ variable "next_public_api_url" {
   default     = ""
 }
 
+variable "panel_server_name" {
+  description = "If set, nginx adds a server block for this Host routing / to the panel container (super admin). Use your panel subdomain, e.g. panel.example.com. Empty = no panel vhost (use direct container port or a manual nginx snippet)."
+  type        = string
+  default     = ""
+}
+
 variable "frontend_url" {
   description = "FRONTEND_URL (e.g. mobile deep link base)."
   type        = string

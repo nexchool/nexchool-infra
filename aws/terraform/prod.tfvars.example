@@ -28,6 +28,9 @@ cors_origins = "https://app.nexchool.in,https://panel.nexchool.in"
 app_public_base_url = "https://api.nexchool.in"
 next_public_api_url = "https://api.nexchool.in"
 
+# Nginx: Host header for super admin (must match DNS). Adds a vhost routing / → panel container.
+# panel_server_name = "panel.nexchool.in"
+
 frontend_url = "schoolerp://"
 
 # default_user_role = "Student"
