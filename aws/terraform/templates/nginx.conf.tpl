@@ -35,6 +35,20 @@ http {
     server panel:3000;
   }
 
+  # Marketing site — Next.js on EC2 host (PM2), not in Docker (see docker-compose nginx extra_hosts).
+  upstream landing_upstream {
+    server host.docker.internal:7000;
+  }
+
+  server {
+    listen 80;
+    server_name nexchool.in www.nexchool.in;
+
+    location / {
+      proxy_pass http://landing_upstream;
+    }
+  }
+
 %{ if trimspace(panel_server_name) != "" ~}
   # Super admin panel (dedicated Host — no /panel path prefix in the app)
   server {

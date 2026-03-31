@@ -141,6 +141,8 @@ services:
   nginx:
     image: nginx:1.27-alpine
     restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       # Host HTTP_PORT -> container 80 (nginx/nginx.prod.conf listen 80)
       - "${HTTP_PORT:-80}:80"

@@ -103,6 +103,8 @@ services:
       nofile:
         soft: 65536
         hard: 65536
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "80:80"
     volumes:
