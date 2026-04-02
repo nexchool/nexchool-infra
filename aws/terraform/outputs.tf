@@ -25,7 +25,13 @@ output "ecr_registry_url" {
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.documents.bucket
+  description = "App storage bucket (single bucket; keys use S3_ENV_PREFIX in the app)."
+  value       = aws_s3_bucket.documents.bucket
+}
+
+output "s3_bucket_arn" {
+  description = "ARN of the app storage bucket."
+  value       = aws_s3_bucket.documents.arn
 }
 
 output "rds_endpoint" {

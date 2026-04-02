@@ -52,3 +52,8 @@ frontend_url = "schoolerp://"
 
 # API listen port (must match nginx upstream — leave default unless you know the implications)
 # api_port = 5001
+
+# Optional: override S3 bucket name (default = {project}-{environment}-documents-{account_id})
+# app_storage_bucket_name = "nexchool-storage-123456789012"
+# Optional: object key prefix for this stack (default = environment, e.g. prod)
+# s3_env_prefix = "prod"

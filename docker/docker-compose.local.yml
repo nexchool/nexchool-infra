@@ -19,6 +19,8 @@ x-api-env: &api-env
   PORT: ${API_PORT:-5001}
   FLASK_PORT: ${API_PORT:-5001}
   GUNICORN_BIND: 0.0.0.0:${API_PORT:-5001}
+  # Pick up new Flask routes / code without manual restart (bind-mounted server tree).
+  GUNICORN_RELOAD: ${GUNICORN_RELOAD:-1}
 
 services:
   postgres:

@@ -23,6 +23,8 @@ locals {
   name_prefix = "${var.project_name}-${var.environment}"
   azs         = slice(data.aws_availability_zones.available.names, 0, 2)
   is_arm      = startswith(var.ec2_instance_type, "t4g") || startswith(var.ec2_instance_type, "m7g") || startswith(var.ec2_instance_type, "c7g")
+  s3_bucket_name = trimspace(var.app_storage_bucket_name) != "" ? trimspace(var.app_storage_bucket_name) : "${local.name_prefix}-documents-${data.aws_caller_identity.current.account_id}"
+  s3_env_prefix  = trimspace(var.s3_env_prefix) != "" ? trimspace(var.s3_env_prefix) : var.environment
 }
 
 # Amazon Linux 2023 — match instance architecture (ARM for t4g.*, x86 for t3.*)
@@ -177,7 +179,7 @@ resource "aws_ecr_repository" "panel" {
 }
 
 resource "aws_s3_bucket" "documents" {
-  bucket = "${local.name_prefix}-documents-${data.aws_caller_identity.current.account_id}"
+  bucket = local.s3_bucket_name
 }
 
 resource "aws_s3_bucket_public_access_block" "documents" {
@@ -193,6 +195,44 @@ resource "aws_s3_bucket_versioning" "documents" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "documents" {
+  bucket = aws_s3_bucket.documents.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "documents" {
+  bucket = aws_s3_bucket.documents.id
+
+  rule {
+    id     = "expire-local-temp"
+    status = "Enabled"
+    filter {
+      prefix = "local/temp/"
+    }
+    expiration {
+      days = 7
+    }
+  }
+
+  rule {
+    id     = "expire-prod-temp"
+    status = "Enabled"
+    filter {
+      prefix = "prod/temp/"
+    }
+    expiration {
+      days = 7
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.documents]
 }
 
 # RDS in public subnets (no NAT); not publicly accessible — private IP only
@@ -371,7 +411,9 @@ resource "aws_instance" "app" {
       mail_use_tls                     = var.mail_use_tls
       mail_use_ssl                     = var.mail_use_ssl
       aws_region                       = var.aws_region
+      aws_s3_bucket_name               = aws_s3_bucket.documents.bucket
       s3_bucket_name                   = aws_s3_bucket.documents.bucket
+      s3_env_prefix                    = local.s3_env_prefix
       port                             = var.api_port
       gunicorn_bind                    = "0.0.0.0:${var.api_port}"
       web_concurrency                  = var.web_concurrency

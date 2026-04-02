@@ -32,7 +32,9 @@ MAIL_USE_TLS=${mail_use_tls}
 MAIL_USE_SSL=${mail_use_ssl}
 
 AWS_REGION=${aws_region}
+AWS_S3_BUCKET_NAME=${aws_s3_bucket_name}
 S3_BUCKET_NAME=${s3_bucket_name}
+S3_ENV_PREFIX=${s3_env_prefix}
 
 PORT=${port}
 GUNICORN_BIND=${gunicorn_bind}

@@ -271,3 +271,16 @@ variable "next_public_gateway_origin" {
   type        = string
   default     = ""
 }
+
+# --- S3 (single shared bucket; app uses S3_ENV_PREFIX for local/prod keys) ---
+variable "app_storage_bucket_name" {
+  description = "Override S3 bucket name for app files. Empty = {project}-{environment}-documents-{account_id}."
+  type        = string
+  default     = ""
+}
+
+variable "s3_env_prefix" {
+  description = "Object key prefix written to AWS_S3_BUCKET_NAME / S3_BUCKET_NAME (e.g. prod). Empty = same as environment variable."
+  type        = string
+  default     = ""
+}
