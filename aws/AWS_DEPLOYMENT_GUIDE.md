@@ -105,7 +105,7 @@ GitHub’s outbound IPs are **not** fixed. If deploy fails with “connection re
 
 ## 5) Environment variables on EC2
 
-Single file `/home/ec2-user/app/.env`, generated from Terraform (`templates/env.tpl`), loaded by **api**, **admin-web**, and **panel** via `env_file: .env`.
+Single file `/home/ec2-user/app/.env`, generated from Terraform (`templates/env.tpl`), loaded by **api**, **celery-worker**, **celery-beat**, **admin-web**, and **panel** via `env_file: .env`.
 
 Includes Flask (`DATABASE_URL`, `SECRET_KEY`, `JWT_*`, `DEFAULT_USER_ROLE`, mail, session, `CORS_ORIGINS`, `BACKEND_URL`, Gunicorn worker/thread envs), AWS (`AWS_REGION`, `S3_BUCKET_NAME`), Redis/Celery URLs, and Next-oriented keys (`NODE_ENV`, `NEXT_PUBLIC_API_URL`, optional `NEXT_PUBLIC_GATEWAY_ORIGIN`). See `aws/terraform/app.env.example` for the full key list.
 
@@ -129,6 +129,8 @@ The generated Compose file includes:
 - **Gunicorn** 1×2 threads (env + `gunicorn_conf.py`)
 - **Next.js** `NODE_OPTIONS=--max-old-space-size=128` on admin-web + panel
 - **API healthcheck** on `GET /api/health` (requires **`curl`** in the API image — see `server/Dockerfile`)
+- **Celery** — `celery-worker` and `celery-beat` use the **same API image** with an overridden entrypoint (email tasks, scheduled jobs). Without `celery-worker`, async email queues are never consumed.
+- **ARM EC2 (`t4g`)** — Do **not** pin `platform: linux/amd64` on app images in Compose. ECR images are **multi-arch**; forcing amd64 on Graviton causes **`exec format error`** in the container. The generated Compose omits `platform` so Docker uses the native **arm64** layer.
 
 ## 8) Rough monthly cost (production)
 
@@ -143,7 +145,7 @@ The generated Compose file includes:
 
 ## 9) Operations
 
-- **Logs:** `sudo docker compose -f /home/ec2-user/app/docker-compose.yml logs -f api`
+- **Logs:** `sudo docker compose -f /home/ec2-user/app/docker-compose.yml logs -f api` — for async email / Celery task errors also: `logs -f celery-worker` (and `celery-beat` for scheduler).
 - **Migrations:** run against RDS from a bastion or temporarily allow your IP on RDS SG (tighten after).
 
 ## Basic Server Monitoring (EC2)

@@ -53,6 +53,44 @@ services:
       redis:
         condition: service_healthy
 
+  celery-worker:
+    image: REPLACE_ME_ECR_API:latest
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging: *json-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 200M
+    env_file:
+      - .env
+    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "worker", "-l", "info"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+  celery-beat:
+    image: REPLACE_ME_ECR_API:latest
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging: *json-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 100M
+    env_file:
+      - .env
+    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "beat", "-l", "info"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
   admin-web:
     image: REPLACE_ME_ECR_ADMIN_WEB:latest
     restart: unless-stopped
