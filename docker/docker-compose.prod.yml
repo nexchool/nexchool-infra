@@ -78,7 +78,7 @@ services:
       dockerfile: Dockerfile
       target: production
     restart: unless-stopped
-    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "worker", "-l", "info"]
+    entrypoint: ["celery", "-A", "celery_worker:celery", "worker", "-l", "info"]
     env_file:
       - ../env/.env.prod
     environment:
@@ -96,7 +96,7 @@ services:
       dockerfile: Dockerfile
       target: production
     restart: unless-stopped
-    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "beat", "-l", "info"]
+    entrypoint: ["celery", "-A", "celery_worker:celery", "beat", "-l", "info"]
     env_file:
       - ../env/.env.prod
     environment:

@@ -70,7 +70,7 @@ services:
           memory: 200M
     env_file:
       - .env
-    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "worker", "-l", "info"]
+    entrypoint: ["celery", "-A", "celery_worker:celery", "worker", "-l", "info"]
     depends_on:
       redis:
         condition: service_healthy
@@ -90,7 +90,7 @@ services:
           memory: 100M
     env_file:
       - .env
-    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "beat", "-l", "info"]
+    entrypoint: ["celery", "-A", "celery_worker:celery", "beat", "-l", "info"]
     depends_on:
       redis:
         condition: service_healthy

@@ -135,7 +135,7 @@ variable "default_user_role" {
 variable "flask_app" {
   description = "FLASK_APP WSGI entry."
   type        = string
-  default     = "backend.app:create_app"
+  default     = "app:create_app"
 }
 
 variable "flask_debug" {

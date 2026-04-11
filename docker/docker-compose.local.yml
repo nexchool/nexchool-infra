@@ -21,6 +21,8 @@ x-api-env: &api-env
   GUNICORN_BIND: 0.0.0.0:${API_PORT:-5001}
   # Pick up new Flask routes / code without manual restart (bind-mounted server tree).
   GUNICORN_RELOAD: ${GUNICORN_RELOAD:-1}
+  # Override env_file: host .env must not set a wrong FLASK_APP (breaks flask db upgrade).
+  FLASK_APP: app:create_app
 
 services:
   postgres:
@@ -81,7 +83,7 @@ services:
     build:
       context: ${SERVER_CONTEXT:-../../server}
       dockerfile: Dockerfile.dev
-    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "worker", "-l", "info"]
+    entrypoint: ["celery", "-A", "celery_worker:celery", "worker", "-l", "info"]
     volumes:
       - ${SERVER_CONTEXT:-../../server}:/app
     env_file:
@@ -99,7 +101,7 @@ services:
     build:
       context: ${SERVER_CONTEXT:-../../server}
       dockerfile: Dockerfile.dev
-    entrypoint: ["celery", "-A", "backend.celery_worker:celery", "beat", "-l", "info"]
+    entrypoint: ["celery", "-A", "celery_worker:celery", "beat", "-l", "info"]
     volumes:
       - ${SERVER_CONTEXT:-../../server}:/app
     env_file:
