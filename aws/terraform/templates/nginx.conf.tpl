@@ -66,6 +66,16 @@ http {
     listen 80;
     server_name _;
 
+    location = /api/notifications/stream {
+      proxy_pass http://api_upstream;
+      proxy_buffering off;
+      proxy_cache off;
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      proxy_read_timeout 1d;
+      proxy_send_timeout 1d;
+    }
+
     location ^~ /api/ {
       proxy_pass http://api_upstream;
     }
