@@ -1,5 +1,8 @@
-# Reference only — production copy is generated from terraform/templates/docker-compose.yml.tpl
-# Replace REPLACE_ME_* with ECR URLs from `terraform output`.
+# AWS EC2 / ECR — pull pre-built images only (no local build).
+# Run from school-erp-infra: docker compose -f docker/docker-compose.ecr.yml --env-file env/.env.prod up -d
+# Or: ./scripts/start-prod.sh
+
+name: school-erp-ecr
 
 x-logging: &json-logging
   driver: json-file
@@ -26,7 +29,7 @@ services:
       retries: 5
 
   api:
-    image: REPLACE_ME_ECR_API:latest
+    image: ${ECR_API_URL}:latest
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
@@ -40,11 +43,11 @@ services:
         soft: 65536
         hard: 65536
     env_file:
-      - .env
+      - ../env/.env.prod
     expose:
-      - "5001"
+      - "${API_PORT}"
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5001/api/health"]
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:${API_PORT}/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -54,7 +57,7 @@ services:
         condition: service_healthy
 
   celery-worker:
-    image: REPLACE_ME_ECR_API:latest
+    image: ${ECR_API_URL}:latest
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
@@ -64,7 +67,7 @@ services:
           cpus: "0.25"
           memory: 200M
     env_file:
-      - .env
+      - ../env/.env.prod
     entrypoint: ["celery", "-A", "celery_worker:celery", "worker", "-l", "info"]
     depends_on:
       redis:
@@ -73,7 +76,7 @@ services:
         condition: service_healthy
 
   celery-beat:
-    image: REPLACE_ME_ECR_API:latest
+    image: ${ECR_API_URL}:latest
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
@@ -83,7 +86,7 @@ services:
           cpus: "0.10"
           memory: 100M
     env_file:
-      - .env
+      - ../env/.env.prod
     entrypoint: ["celery", "-A", "celery_worker:celery", "beat", "-l", "info"]
     depends_on:
       redis:
@@ -92,7 +95,7 @@ services:
         condition: service_healthy
 
   admin-web:
-    image: REPLACE_ME_ECR_ADMIN_WEB:latest
+    image: ${ECR_ADMIN_WEB_URL}:latest
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
@@ -102,7 +105,7 @@ services:
           cpus: "0.25"
           memory: 200M
     env_file:
-      - .env
+      - ../env/.env.prod
     expose:
       - "3000"
     depends_on:
@@ -110,7 +113,7 @@ services:
         condition: service_healthy
 
   panel:
-    image: REPLACE_ME_ECR_PANEL:latest
+    image: ${ECR_PANEL_URL}:latest
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
@@ -120,7 +123,7 @@ services:
           cpus: "0.25"
           memory: 200M
     env_file:
-      - .env
+      - ../env/.env.prod
     expose:
       - "3000"
     depends_on:
@@ -132,6 +135,8 @@ services:
     restart: unless-stopped
     stop_grace_period: 30s
     logging: *json-logging
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     deploy:
       resources:
         limits:
@@ -141,12 +146,10 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     ports:
-      - "80:80"
+      - "${HTTP_PORT:-80}:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       api:
         condition: service_healthy

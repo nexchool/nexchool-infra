@@ -1,7 +1,7 @@
 # From infra root: ./scripts/dev.sh
 # Build/volume paths are relative to this file's directory (docker/).
 # Nested layout: apps at ../../server, ../../admin-web, ../../panel (monorepo root).
-# Nginx: host ${HTTP_PORT} -> container 80 (uses nginx/nginx.local.conf).
+# Nginx: ../nginx/nginx.local.conf (default: admin on localhost; optional: panel.localhost)
 
 name: school-erp-local
 
@@ -122,6 +122,15 @@ services:
       target: development
       args:
         NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
+        NEXT_PUBLIC_PANEL_URL: ${NEXT_PUBLIC_PANEL_URL:-}
+        NEXT_PUBLIC_GATEWAY_ORIGIN: ${NEXT_PUBLIC_GATEWAY_ORIGIN:-}
+        NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY:-}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:-}
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID:-}
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET:-}
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID:-}
+        NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID:-}
+        NEXT_PUBLIC_FIREBASE_VAPID_KEY: ${NEXT_PUBLIC_FIREBASE_VAPID_KEY:-}
     ports:
       # Publish Next dev server to host (container always listens on 3000)
       - "${ADMIN_WEB_HOST_PORT:-3000}:3000"
@@ -136,8 +145,8 @@ services:
       NODE_ENV: development
       NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
       NEXT_PUBLIC_API_URL_DEV: ${PUBLIC_API_URL:-}
-      # Browser on :3000/:3001 must call Flask via nginx (${HTTP_PORT}), not Next.
       NEXT_PUBLIC_GATEWAY_ORIGIN: http://localhost:${HTTP_PORT:-80}
+      NEXT_PUBLIC_PANEL_URL: ${NEXT_PUBLIC_PANEL_URL:-}
     depends_on:
       api:
         condition: service_healthy
@@ -150,8 +159,10 @@ services:
       target: development
       args:
         NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
+        NEXT_PUBLIC_PANEL_URL: ${NEXT_PUBLIC_PANEL_URL:-}
+        NEXT_PUBLIC_GATEWAY_ORIGIN: ${NEXT_PUBLIC_GATEWAY_ORIGIN:-}
     ports:
-      # Super admin: http://localhost:PANEL_HOST_PORT/ or via nginx http://panel.localhost/ (see nginx.local.conf)
+      # Direct panel dev port (recommended). Optional nginx host routing via panel.localhost.
       - "${PANEL_HOST_PORT:-3001}:3000"
     volumes:
       - ${SUPER_ADMIN_CONTEXT:-../../panel}:/app
@@ -162,6 +173,7 @@ services:
       NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-}
       NEXT_PUBLIC_API_URL_DEV: ${PUBLIC_API_URL:-}
       NEXT_PUBLIC_GATEWAY_ORIGIN: http://localhost:${HTTP_PORT:-80}
+      NEXT_PUBLIC_PANEL_URL: ${NEXT_PUBLIC_PANEL_URL:-}
     depends_on:
       api:
         condition: service_healthy

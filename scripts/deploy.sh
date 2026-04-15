@@ -15,8 +15,15 @@ case "$TARGET" in
     ENV_FILE="$ROOT/env/.env.prod"
     COMPOSE_FILE="docker/docker-compose.prod.yml"
     ;;
+  ecr)
+    cd "$ROOT"
+    docker compose -f docker/docker-compose.ecr.yml --env-file env/.env.prod pull
+    docker compose -f docker/docker-compose.ecr.yml --env-file env/.env.prod up -d
+    echo ">>> Deploy (ecr) done."
+    exit 0
+    ;;
   *)
-    echo "Usage: $0 [prod]" >&2
+    echo "Usage: $0 [prod|ecr]" >&2
     exit 1
     ;;
 esac
