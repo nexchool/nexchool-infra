@@ -63,7 +63,7 @@ docker compose -f docker/docker-compose.ecr.yml --env-file env/.env.prod up -d
 Config lives in **`nginx/`** and is mounted by compose:
 
 - **Local**: `nginx/nginx.local.conf`
-- **Prod/ECR**: `nginx/nginx.prod.conf` (includes marketing site `nexchool.in` + `www.nexchool.in`)
+- **Prod/ECR**: `nginx/nginx.prod.conf` (HTTPS, marketing `nexchool.in` / `www`, app, panel, api; PEMs in `nginx/ssl/`)
 
 ## CI
 
