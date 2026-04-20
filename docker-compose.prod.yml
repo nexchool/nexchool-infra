@@ -55,16 +55,30 @@ services:
       start_period: 90s
     logging: *default-logging
 
+  # Worker loads the full Flask app (DB, WeasyPrint, etc.). 250M + concurrency=2 was OOM-killed (exit 137).
+  # Match embedded pattern: single process; raise memory so fork + PDF/email tasks can complete.
   celery-worker:
     image: ${ECR_API_URL}:latest
     restart: unless-stopped
-    entrypoint: ["celery", "-A", "celery_worker:celery", "worker", "-l", "info", "--concurrency=2"]
+    entrypoint:
+      [
+        "celery",
+        "-A",
+        "celery_worker:celery",
+        "worker",
+        "-l",
+        "info",
+        "--concurrency=1",
+        "--max-tasks-per-child=50",
+      ]
     env_file: .env.prod
+    environment:
+      XDG_CACHE_HOME: /tmp
     deploy:
       resources:
         limits:
           cpus: "0.50"
-          memory: 250M
+          memory: 300M
     depends_on:
       redis:
         condition: service_healthy
@@ -77,11 +91,13 @@ services:
     restart: unless-stopped
     entrypoint: ["celery", "-A", "celery_worker:celery", "beat", "-l", "info"]
     env_file: .env.prod
+    environment:
+      XDG_CACHE_HOME: /tmp
     deploy:
       resources:
         limits:
           cpus: "0.15"
-          memory: 150M
+          memory: 256M
     depends_on:
       redis:
         condition: service_healthy
