@@ -1,10 +1,6 @@
 .DS_Store
-.env
-docker/.env
 
 # Real env files — never commit
 env/.env.local
 env/.env.prod
 !env/*.example
-
-*.pem

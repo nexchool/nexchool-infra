@@ -1,2 +1,1 @@
-ssl/*.pem
-ssl/*.key
+# SSL certs live on EC2 at /etc/letsencrypt — nothing to ignore here
